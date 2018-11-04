@@ -6,13 +6,13 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet"
 	href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-<title>Produkt</title>
+<title>Product</title>
 </head>
 <body>
 	<section>
 		<div class="jumbotron">
 			<div class="container">
-				<h1>Produkt</h1>
+				<h1>Product</h1>
 			</div>
 		</div>
 	</section>
@@ -22,23 +22,23 @@
 				<h3>${product.name}</h3>
 				<p>${product.description}</p>
 				<p>
-					<strong>Kod produktu: </strong><span class="label label-warning">${product.productId}</span>
+					<strong>Product code: </strong><span class="label label-warning">${product.productId}</span>
 				</p>
 				<p>
 					<strong>Producent</strong>: ${product.manufacturer}
 				</p>
 				<p>
-					<strong>Kategoria</strong>: ${product.category}
+					<strong>Category</strong>: ${product.category}
 				</p>
 				<p>
-					<strong>Liczba sztuk w magazynie</strong>: ${product.unitsInStock}
+					<strong>Units in stock</strong>: ${product.unitsInStock}
 				</p>
 				<h4>${product.unitPrice} PLN</h4>
 				<p>
 					<a href="#" class="btn btn-warning btn-large"> <span
-						class="glyphicon-shopping-cart glyphicon"></span> Zamów teraz
+						class="glyphicon-shopping-cart glyphicon"></span> Order now
 					</a> <a href="<spring:url value="/products" />" class="btn btn-default">
-						<span class="glyphicon-hand-left glyphicon"></span> powrót
+						<span class="glyphicon-hand-left glyphicon"></span> back
 					</a>
 
 				</p>
