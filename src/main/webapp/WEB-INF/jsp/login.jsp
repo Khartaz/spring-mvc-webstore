@@ -2,10 +2,14 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
+
+<sec:authentication property="principal" var="auth" scope="session" />
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/ 3.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
     <title>Products</title>
 </head>
 <body>
@@ -13,7 +17,6 @@
         <div class="jumbotron">
             <div class="container">
                 <h1>Products</h1>
-                <p>Add Products</p>
             </div>
         </div>
     </section>
@@ -30,17 +33,16 @@
                                 <spring:message code="AbstractUserDetailsAuthenticationProvider.badCredentials"/><br/>
                             </div>
                         </c:if>
-                        <c:url var="logout" value="/logout" />
-                        <form name='login' action="login"  method="POST">
+                        <h2>${auth}</h2>
+                        <form action="<c:url value="/login" />" method="POST">
                             <fieldset>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="User Name"
-                                           name='j_username' type="text">
+                                    <input class="form-control" placeholder="User Name" type="text" name="username" /><br/>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Password"
-                                           name='j_password' type="password" value="">
+                                    <input class="form-control" placeholder="Password" type="password" name="password" /><br>
                                 </div>
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/> <br/>
                                 <input class="btn btn-lg btn-success btn-block" type="submit" value="Login">
                             </fieldset>
                         </form>

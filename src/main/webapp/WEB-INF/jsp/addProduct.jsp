@@ -5,7 +5,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type", content="text/html"; charset="UTF-8">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/ 3.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
     <title>Products</title>
 </head>
 <body>
@@ -13,11 +13,8 @@
         <div class="jumbotrom">
             <div class="container">
                 <h1>Products</h1>
-                <p>Add Products</p>
-                <a href="<c:url var="logout" value="/logout" />" class="btn btn-danger btn-mini pull-right">
-                    Logout
-                </a>
             </div>
+            <a href="<c:url value="/logout" />" class="btn btn-danger btn-mini pull-right">Logout</a>
         </div>
     </section>
     <section class="container">
