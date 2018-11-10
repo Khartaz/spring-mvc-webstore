@@ -6,10 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryProductRepository implements ProductRepository {
-
+    private final static String BRAND = "brand";
+    private final static String CATEGORY = "category";
     private List<Product> listOfProducts = new ArrayList<>();
 
     public InMemoryProductRepository() {
@@ -42,26 +44,17 @@ public class InMemoryProductRepository implements ProductRepository {
     }
 
     public Product getProductById(String productId) {
-        Product productById = null;
-        for(Product product : listOfProducts) {
-            if(product!= null && product.getProductId()!= null && product.getProductId().equals(productId)) {
-                productById = product;
-                break;
-            }
-        }
-        if (productById == null) {
-            throw new IllegalArgumentException("No product in stock" + productId);
-        }
-        return productById;
+        return listOfProducts.stream()
+                .filter(p -> productId.equalsIgnoreCase(p.getProductId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No product in stock: " + productId));
     }
 
     public List<Product> getProductsByCategory(String category) {
-        List<Product> productsByCategory = new ArrayList<>();
-        for(Product product : listOfProducts) {
-            if(category.equalsIgnoreCase(product.getCategory())) {
-                productsByCategory.add(product);
-            }
-        }
+        List<Product> productsByCategory = listOfProducts.stream()
+                .filter(product -> product.getCategory().equalsIgnoreCase(category))
+                .collect(Collectors.toList());
+
         return productsByCategory;
     }
 
@@ -69,6 +62,7 @@ public class InMemoryProductRepository implements ProductRepository {
         Set<Product> productsByBrand = new HashSet<>();
         Set<Product> productsByCategory = new HashSet<>();
         Set<String> criterias = filterParams.keySet();
+
         if(criterias.contains("brand")) {
             for (String brandName : filterParams.get("brand")) {
                 for (Product product : listOfProducts) {
@@ -78,23 +72,39 @@ public class InMemoryProductRepository implements ProductRepository {
                 }
             }
         }
+        /*
+        Set<Product> productsByBrand = filterParams.keySet().stream()
+                .filter(v -> v.contains(BRAND))
+                .map(filterParams::get)
+                .flatMap(x -> listOfProducts.stream()
+                        .filter(r -> r.getManufacturer().equalsIgnoreCase(BRAND)))
+                .collect(Collectors.toSet());
+
+        Set<Product> productsByCategory = filterParams.keySet().stream()
+                .flatMap(x -> listOfProducts.stream().filter(v -> v.getCategory().equalsIgnoreCase(x)))
+                .collect(Collectors.toSet());
+        */
         if (criterias.contains("category")) {
             for (String category : filterParams.get("category")) {
                 productsByCategory.addAll(this.getProductsByCategory(category));
             }
         }
+
         productsByCategory.retainAll(productsByBrand);
+
         return productsByCategory;
     }
 
     public List<Product> getProductsByManufacturer(String manufacturer) {
-        List<Product> productsByManufacturer = new ArrayList<>();
-        for(Product product : listOfProducts) {
-            if (manufacturer.equalsIgnoreCase(product.getManufacturer())) {
-                productsByManufacturer.add(product);
-            }
-        }
+        List<Product> productsByManufacturer = listOfProducts.stream()
+                .filter(p -> manufacturer.equalsIgnoreCase(p.getManufacturer()))
+                .collect(Collectors.toList());
+
         return productsByManufacturer;
+    }
+
+    public void addProduct(Product product) {
+        listOfProducts.add(product);
     }
 
 }

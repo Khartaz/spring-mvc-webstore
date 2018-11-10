@@ -3,8 +3,11 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-    <title>Witaj</title>
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+    <title>Welcome</title>
+
+    <c:url value="/css/main.css" var="jstlCss" />
+    <link href="${jstlCss}" rel="stylesheet" />
 </head>
 <body>
 <section>
