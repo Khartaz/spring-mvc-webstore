@@ -9,8 +9,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -68,19 +71,35 @@ public class ProductController {
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String processAddNewProductForm(@ModelAttribute("newProduct")
-                                                       Product productToBeAdded, BindingResult bindingResult) {
+              Product productToBeAdded, BindingResult bindingResult, HttpServletRequest request) {
         String[] suppressedFields = bindingResult.getSuppressedFields();
+
         if(suppressedFields.length > 0) {
             throw new RuntimeException("Attempting to bind prohibited fields: "
                     + StringUtils.arrayToCommaDelimitedString(suppressedFields));
         }
+
+        MultipartFile productImage = productToBeAdded.getProductImage();
+        String rootDirectory = request.getSession().getServletContext().getRealPath("/");
+        if(productImage!= null && !productImage.isEmpty()) {
+            try {
+                productImage.transferTo(new File(rootDirectory + "resources\\images\\"
+                        + productToBeAdded.getProductId() + ".png"));
+            } catch (Exception e) {
+                throw new RuntimeException("Failed when trying to save image ", e);
+            }
+        }
+
         productService.addProduct(productToBeAdded);
         return "redirect:/products";
     }
 
     @InitBinder
     public void initialiseBinder(WebDataBinder binder) {
-        binder.setDisallowedFields("unitsInOrder", "discontinued");
+        binder.setAllowedFields(
+                "productId","name","unitPrice",
+                "description","manufacturer","category",
+                "unitsInStock", "condition","productImage");
     }
 
 }

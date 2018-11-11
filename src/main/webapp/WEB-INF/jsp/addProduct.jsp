@@ -3,9 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<sec:authorize access="isAuthenticated()">
-    authenticated as <sec:authentication property="username"/>
-</sec:authorize>
+
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
@@ -22,7 +20,7 @@
         </div>
     </section>
     <section class="container">
-        <form:form modelAttribute="newProduct" class="form-horizontal">
+        <form:form modelAttribute="newProduct" class="form-horizontal" enctype="multipart/form-data">
             <fieldset>
                 <legend>Add New Product</legend>
                 <div class="form-group">
@@ -75,6 +73,14 @@
                         <form:radiobutton id="condition" path="condition" value="New" /> New
                         <form:radiobutton id="condition" path="condition" value="Old"/> Old
                         <form:radiobutton id="condition" path="condition" value="Refurbished"/> Refurbished
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-2" for="productImage">
+                        <spring:message code="addProduct.form.productImage.label" />
+                    </label>
+                    <div class="col-lg-10">
+                        <form:input id="productImage" path="productImage" type="file" class="form:input-large" />
                     </div>
                 </div>
                 <div class="form-group">
