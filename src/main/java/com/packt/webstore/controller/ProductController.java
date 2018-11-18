@@ -1,7 +1,10 @@
 package com.packt.webstore.controller;
 
 import com.packt.webstore.domain.Product;
+import com.packt.webstore.exception.NoProductsFoundUnderCategoryException;
+import com.packt.webstore.exception.ProductNotFoundException;
 import com.packt.webstore.service.ProductService;
+import com.packt.webstore.validator.ProductValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +26,9 @@ import java.util.Map;
 public class ProductController {
     @Autowired
     private ProductService productService;
+    @Autowired
+    private ProductValidator productValidator;
+
 
     @RequestMapping
     public String list(Model model) {
@@ -39,13 +46,16 @@ public class ProductController {
 
     @RequestMapping("/{category}")
     public String getProductsByCategory(Model model, @PathVariable("category") String productCategory) {
-        model.addAttribute("products", productService.getProductsByCategory(productCategory));
+        List<Product> products = productService.getProductsByCategory(productCategory);
+        if (products == null || products.isEmpty()) {
+            throw new NoProductsFoundUnderCategoryException();
+        }
+        model.addAttribute("products", products);
         return "products";
     }
 
     @RequestMapping("/filter/{ByCriteria}")
-    public String getProductsByFilter(@MatrixVariable(pathVar = "ByCriteria")
-                                                  Map<String, List<String>> filterParams, Model model) {
+    public String getProductsByFilter(@MatrixVariable(pathVar="ByCriteria") Map<String,List<String>> filterParams, Model model) {
         model.addAttribute("products", productService.getProductsByFilter(filterParams));
         return "products";
     }
@@ -71,7 +81,7 @@ public class ProductController {
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String processAddNewProductForm(@ModelAttribute("newProduct")
-              Product productToBeAdded, BindingResult bindingResult, HttpServletRequest request) {
+              @Valid Product productToBeAdded, BindingResult bindingResult, HttpServletRequest request) {
         String[] suppressedFields = bindingResult.getSuppressedFields();
 
         if(suppressedFields.length > 0) {
@@ -80,13 +90,28 @@ public class ProductController {
         }
 
         MultipartFile productImage = productToBeAdded.getProductImage();
-        String rootDirectory = request.getSession().getServletContext().getRealPath("/");
+        String rootDirectoryImg = request.getSession().getServletContext().getRealPath("/");
         if(productImage!= null && !productImage.isEmpty()) {
             try {
-                productImage.transferTo(new File(rootDirectory + "resources\\images\\"
+                System.out.println(rootDirectoryImg);
+                productImage.transferTo(new File(rootDirectoryImg + "resources/images/"
                         + productToBeAdded.getProductId() + ".png"));
             } catch (Exception e) {
                 throw new RuntimeException("Failed when trying to save image ", e);
+            }
+        }
+        if(bindingResult.hasErrors()) {
+            return "addProduct";
+        }
+
+        MultipartFile productPdf = productToBeAdded.getProductPdf();
+        String rootDirectoryPdf = request.getSession().getServletContext().getRealPath("/");
+        if(productPdf!= null && !productPdf.isEmpty()) {
+            try {
+                productPdf.transferTo(new File(rootDirectoryPdf + "resources/images/"
+                        + productToBeAdded.getProductId() + ".pdf"));
+            } catch (Exception e) {
+                throw new RuntimeException("Failed when trying to save pdf ", e);
             }
         }
 
@@ -98,8 +123,25 @@ public class ProductController {
     public void initialiseBinder(WebDataBinder binder) {
         binder.setAllowedFields(
                 "productId","name","unitPrice",
-                "description","manufacturer","category",
-                "unitsInStock", "condition","productImage");
+                "description","manufacturer","category", "language",
+                "unitsInStock", "condition","productImage", "productPdf");
+        binder.setValidator(productValidator);
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ModelAndView handleError(HttpServletRequest request, ProductNotFoundException exception) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("invalidProductId", exception.getProductId());
+        modelAndView.addObject("exception", exception);
+        modelAndView.addObject("url", request.getRequestURI() + "?" + request.getQueryString());
+        modelAndView.setViewName("productNotFound");
+
+        return modelAndView;
+    }
+
+    @RequestMapping("/invalidPromoCode")
+    public String invalidPromoCode() {
+        return "invalidPromoCode";
     }
 
 }

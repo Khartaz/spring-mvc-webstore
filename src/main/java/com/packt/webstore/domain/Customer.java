@@ -1,24 +1,32 @@
 package com.packt.webstore.domain;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Customer {
-    private int customerId;
+public class Customer implements Serializable {
+    private static final long serialVersionUID = 2284040482222162898L;
+    private String customerId;
     private String name;
-    private String address;
-    private String noOfOrdersMade;
+    private Address billingAddress;
+    private String phoneNumber;
 
     public Customer() {
         super();
+        this.billingAddress = new Address();
     }
 
-    public Customer(int customerId, String name, String address) {
+    public Customer(String customerId, String name) {
+        this();
         this.customerId = customerId;
         this.name = name;
-        this.address = address;
     }
 
-    public int getCustomerId() {
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public String getCustomerId() {
         return customerId;
     }
 
@@ -26,15 +34,15 @@ public class Customer {
         return name;
     }
 
-    public String getAddress() {
-        return address;
+    public Address getBillingAddress() {
+        return billingAddress;
     }
 
-    public String getNoOfOrdersMade() {
-        return noOfOrdersMade;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setCustomerId(int customerId) {
+    public void setCustomerId(String customerId) {
         this.customerId = customerId;
     }
 
@@ -42,12 +50,12 @@ public class Customer {
         this.name = name;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setBillingAddress(Address billingAddress) {
+        this.billingAddress = billingAddress;
     }
 
-    public void setNoOfOrdersMade(String noOfOrdersMade) {
-        this.noOfOrdersMade = noOfOrdersMade;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     @Override
@@ -55,20 +63,14 @@ public class Customer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return customerId == customer.customerId;
-}
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(customerId);
+        return Objects.equals(customerId, customer.customerId) &&
+                Objects.equals(name, customer.name) &&
+                Objects.equals(billingAddress, customer.billingAddress) &&
+                Objects.equals(phoneNumber, customer.phoneNumber);
     }
 
     @Override
-    public String toString() {
-        return "Customer{" +
-                "customerId=" + customerId +
-                ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
-                '}';
+    public int hashCode() {
+        return Objects.hash(customerId, name, billingAddress, phoneNumber);
     }
 }

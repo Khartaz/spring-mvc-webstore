@@ -2,6 +2,7 @@ package com.packt.webstore.domain.repository.impl;
 
 import com.packt.webstore.domain.Product;
 import com.packt.webstore.domain.repository.ProductRepository;
+import com.packt.webstore.exception.ProductNotFoundException;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -47,7 +48,7 @@ public class InMemoryProductRepository implements ProductRepository {
         return listOfProducts.stream()
                 .filter(p -> productId.equalsIgnoreCase(p.getProductId()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No product in stock: " + productId));
+                .orElseThrow(() -> new ProductNotFoundException("No product in stock: " + productId));
     }
 
     public List<Product> getProductsByCategory(String category) {
@@ -59,33 +60,37 @@ public class InMemoryProductRepository implements ProductRepository {
     }
 
     public Set<Product> getProductsByFilter(Map<String, List<String>> filterParams) {
-        Set<Product> productsByBrand = new HashSet<>();
+        //Set<Product> productsByBrand = new HashSet<>();
         Set<Product> productsByCategory = new HashSet<>();
-        Set<String> criterias = filterParams.keySet();
 
+        Set<String> criterias = filterParams.keySet();
+        /*
         if(criterias.contains("brand")) {
-            for (String brandName : filterParams.get("brand")) {
-                for (Product product : listOfProducts) {
-                    if (brandName.equalsIgnoreCase(product.getManufacturer())) {
+            for(String brandName: filterParams.get("brand")) {
+                for(Product product: listOfProducts) {
+                    if(brandName.equalsIgnoreCase(product.getManufacturer())){
                         productsByBrand.add(product);
                     }
                 }
             }
         }
-        /*
-        Set<Product> productsByBrand = filterParams.keySet().stream()
-                .filter(v -> v.contains(BRAND))
-                .map(filterParams::get)
-                .flatMap(x -> listOfProducts.stream()
-                        .filter(r -> r.getManufacturer().equalsIgnoreCase(BRAND)))
-                .collect(Collectors.toSet());
 
+        */
+        Set<Product> productsByBrand =  filterParams.keySet()
+                .stream()
+                .filter(p -> p.equalsIgnoreCase(BRAND))
+                .findFirst()
+                .map(p -> listOfProducts.stream()
+                            .filter(v -> v.getManufacturer().equalsIgnoreCase(p))
+                            .collect(Collectors.toSet())
+                ).orElse(Collections.emptySet());
+        /*
         Set<Product> productsByCategory = filterParams.keySet().stream()
                 .flatMap(x -> listOfProducts.stream().filter(v -> v.getCategory().equalsIgnoreCase(x)))
                 .collect(Collectors.toSet());
         */
-        if (criterias.contains("category")) {
-            for (String category : filterParams.get("category")) {
+        if(criterias.contains("category")) {
+            for(String category: filterParams.get("category")) {
                 productsByCategory.addAll(this.getProductsByCategory(category));
             }
         }

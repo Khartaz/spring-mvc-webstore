@@ -3,6 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<c:url var="logoutUrl" value="/login"/>
 
 <html>
 <head>
@@ -16,31 +17,38 @@
             <div class="container">
                 <h1>Products</h1>
             </div>
-            <a href="<c:url value="/logout" />" class="btn btn-danger btn-mini pull-right">Logout</a>
+            <a href="<c:url value="/login" />" class="btn btn-danger btn-mini pull-right">Logout</a>
+        </div>
+        <div class="pull-right" style="padding-right:50px">
+            <a href="?language=pl" >Polski</a>|<a href="?language=nl">Dutch</a>
         </div>
     </section>
     <section class="container">
         <form:form modelAttribute="newProduct" class="form-horizontal" enctype="multipart/form-data">
             <fieldset>
                 <legend>Add New Product</legend>
+                <form:errors path="*" cssClass="alert alert-danger" element="div"/>
                 <div class="form-group">
                     <label class="control-label col-lg-2 col-lg-2" for="productId">
                         <spring:message code="addProduct.form.productId.label" />
                     </label>
                     <div class="col-lg-10">
                         <form:input id="productId" path="productId" type="text" class="form:input-large"/>
+                        <form:errors path="productId" cssClass="text-danger" />
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-2 col-lg-2" for="name">Product Name</label>
                     <div class="col-lg-10">
                         <form:input id="name" path="name" type="text" class="form:input-large"/>
+                        <form:errors path="name" cssClass="text-danger" />
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-2 col-lg-2" for="unitPrice">Unit Price</label>
                     <div class="col-lg-10">
                         <form:input id="unitPrice" path="unitPrice" type="text" class="form:input-large"/>
+                        <form:errors path="unitPrice" cssClass="text-danger" />
                     </div>
                 </div>
                 <div class="form-group">
@@ -81,6 +89,15 @@
                     </label>
                     <div class="col-lg-10">
                         <form:input id="productImage" path="productImage" type="file" class="form:input-large" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-lg-2" for="productPdf">
+                        <spring:message code="addProduct.form.productPdf.label" />
+                    </label>
+                    <div class="col-lg-10">
+                        <form:input id="productPdf" path="productPdf"  type="file" cssClass="form:input-large"/>
                     </div>
                 </div>
                 <div class="form-group">

@@ -1,12 +1,20 @@
 package com.packt.webstore.domain;
 
+import com.packt.webstore.validator.ProductId;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
 public class Product {
+    @Pattern(regexp = "P[0-9]+", message = "{com.packt.webstore.domain.Product.ProductId}")
+    @ProductId
     private String productId;
+    @Size(min = 4, max = 50, message = "com.packt.webstore.domain.Product.Name")
     private String name;
+    @Min(value = 0, message = "com.packt.webstore.domain.Product.PriceMin")
+    @Digits(integer = 8, fraction = 2, message = "com.packt.webstore.domain.Product.PriceDigits")
+    @NotNull(message = "com.packt.webstore.domain.Product.PriceNotNull")
     private BigDecimal unitPrice;
     private String description;
     private String manufacturer;
@@ -16,6 +24,7 @@ public class Product {
     private boolean discontinued;
     private String condition;
     private MultipartFile productImage;
+    private MultipartFile productPdf;
 
     public Product() {
         super();
@@ -71,6 +80,10 @@ public class Product {
         return productImage;
     }
 
+    public MultipartFile getProductPdf() {
+        return productPdf;
+    }
+
     public void setProductId(String productId) {
         this.productId = productId;
     }
@@ -113,6 +126,10 @@ public class Product {
 
     public void setProductImage(MultipartFile productImage) {
         this.productImage = productImage;
+    }
+
+    public void setProductPdf(MultipartFile productPdf) {
+        this.productPdf = productPdf;
     }
 
     @Override
